@@ -15,4 +15,4 @@ if req.ok:
     # print(arrayLinks)
     with open("links.csv", 'w') as dataLinks:
         writer = csv.writer(dataLinks, delimiter='\n')
-        writer.writerow(arrayLinks)
+        writer.writerow(arrayLinks[1:])
