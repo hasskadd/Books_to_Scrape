@@ -20,12 +20,15 @@ if req.ok:
 
     with open("links.txt", 'r') as file:
         next(file)  # Lire a partir de la deuxieme ligne du fichier
+        arrayLinksBooksTxt = []
         for row in file:
-            print(row)
+            # print(row)
 
             url = row.strip()
             requete = requests.get(url)
-            print(requete)
+            # print(requete)
+            arrayBooksLink = []
+
             if requete.ok:
                 res = BeautifulSoup(requete.text, "html.parser")
                 liste = res.findAll(class_="image_container")
@@ -33,8 +36,6 @@ if req.ok:
                 arrayLinksBooks = []
                 urlSplit = url.split('/index.html')[0]
 
-            # linksBooks = liste.findchildren('a')
-            # print(liste.next_sibling)
                 if linkNext:
                     numberOfPage = (linkNext.string).split('of')[1].strip()
                     for i in range(1, int(numberOfPage) + 1):
@@ -45,12 +46,20 @@ if req.ok:
                         for link in liste:
                             for col in link.findAll('a'):
                                 linkNative = col.get('href').split('../')[3]
-                                print(
+                                # print(
+                                # 'https://books.toscrape.com/catalogue/' + linkNative)
+                                arrayLinksBooksTxt.append(
                                     'https://books.toscrape.com/catalogue/' + linkNative)
                 else:
                     for link in liste:
                         for col in link.findAll('a'):
                             linkNative = col.get('href').split('../')[3]
-                            print(
+                            # print(
+                            # 'https://books.toscrape.com/catalogue/' + linkNative)
+                            arrayLinksBooksTxt.append(
                                 'https://books.toscrape.com/catalogue/' + linkNative)
-            print('_____________________________')
+        print(arrayLinksBooksTxt)
+        with open("allBooksLinks.txt", 'w') as dataF:
+            for link in arrayLinksBooksTxt:
+                dataF.write(link + '\n')
+        print('_____________________________')
