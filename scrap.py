@@ -30,26 +30,27 @@ if req.ok:
                 res = BeautifulSoup(requete.text, "html.parser")
                 liste = res.findAll(class_="image_container")
                 linkNext = res.find(class_="current")
-                # linksBooks = liste.findchildren('a')
-               # print(liste.next_sibling)
+                arrayLinksBooks = []
+                urlSplit = url.split('/index.html')[0]
+
+            # linksBooks = liste.findchildren('a')
+            # print(liste.next_sibling)
                 if linkNext:
                     numberOfPage = (linkNext.string).split('of')[1].strip()
-                    print(numberOfPage)
+                    for i in range(1, int(numberOfPage) + 1):
+                        urlNext = urlSplit + '/' + 'page-'+str(i)+'.html'
+                        req = requests.get(urlNext)
+                        res = BeautifulSoup(req.text, "html.parser")
+                        liste = res.findAll(class_="image_container")
+                        for link in liste:
+                            for col in link.findAll('a'):
+                                linkNative = col.get('href').split('../')[3]
+                                print(
+                                    'https://books.toscrape.com/catalogue/' + linkNative)
+                else:
+                    for link in liste:
+                        for col in link.findAll('a'):
+                            linkNative = col.get('href').split('../')[3]
+                            print(
+                                'https://books.toscrape.com/catalogue/' + linkNative)
             print('_____________________________')
-""""
-                arrayLinksBooks = []
-                for link in liste:
-                    for col in link.findAll('a'):
-                        linkNative = col.get('href').split('../')
-                        print(linkNative)
-
-
-                    # splitLink = link.get('href').split('../')[3]
-                   # print(splitLink)
-                    # arrayLinksBooks.append(
-                    # 'http://books.toscrape.com/catalogue/' + splitLink)
-
-                    # time.sleep(3)
-                # print(arrayLinksBooks)
-
-"""
