@@ -1,6 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 import csv
+import pandas as pd
+import re
 
 
 url = "http://books.toscrape.com/index.html"
@@ -58,8 +60,87 @@ if req.ok:
                             # 'https://books.toscrape.com/catalogue/' + linkNative)
                             arrayLinksBooksTxt.append(
                                 'https://books.toscrape.com/catalogue/' + linkNative)
-        print(arrayLinksBooksTxt)
-        with open("allBooksLinks.txt", 'w') as dataF:
-            for link in arrayLinksBooksTxt:
-                dataF.write(link + '\n')
-        print('_____________________________')
+
+    # All Books Links
+    array_product_page_url = []
+    array_universal_product_code = []
+    array_title = []
+    array_price_incl_tax = []
+    array_price_excl_tax = []
+    array_numb_available = []
+    array_description = []
+    array_category = []
+    array_img_url = []
+    array_rating = []
+
+    for i in arrayLinksBooksTxt:
+        req = requests.get(i)
+        if req.ok:
+            res = BeautifulSoup(req.content, 'html.parser')
+            # make an array of books links
+            product_page_url = url
+            array_product_page_url.append(product_page_url)
+            # make an array of UPC
+            universal_product_code = res.find(
+                "th", text="UPC").find_next_sibling("td").text
+            array_universal_product_code.append(universal_product_code)
+            # make an array of titles
+            title = (res.find("h1")).string
+            array_title.append(title)
+            # make an array of price include taxes
+            price_including_tax = (res.find(
+                "th", text="Price (incl. tax)").find_next_sibling("td").text).split('£')[1]
+            array_price_incl_tax.append(price_including_tax)
+            # make an array of price excl taxes
+            price_excluding_tax = (res.find(
+                "th", text="Price (excl. tax)").find_next_sibling("td").text).split('£')[1]
+            array_price_excl_tax.append(price_excluding_tax)
+            # make an array of number available
+            stringSplit = (
+                res.find("th", text="Availability").find_next_sibling("td").text)
+            number_available = (re.split("[( | )]", stringSplit))[3]
+            array_numb_available.append(number_available)
+            # make an array of category
+            findCategory = (
+                res.find("li", {"class": "active"})).find_previous_sibling("li")
+            category = (findCategory.find("a")).string
+            array_category.append(category)
+            # make an array of image link
+            image_url = "https://books.toscrape.com/" + \
+                ((((res.find(class_="item active")).find(
+                    "img")).get("src")).split("../"))[2]
+            array_img_url.append(image_url)
+            # make an array of rating
+            ratingStar = {
+                "One": "1/5",
+                "Two": "2/5",
+                "Three": "3/5",
+                "Four": "4/5",
+                "Five": "5/5"
+            }
+            find_rating = (((res.find(class_="instock availability")
+                             ).find_next_sibling("p")).get("class"))[1]
+            review_rating = ratingStar.get(find_rating)
+            array_rating.append(review_rating)
+            # make an array of description
+            # description = ((res.find(class_="sub-header")
+            #               ).find_next_sibling("p")).text
+            # array_description.append(description)
+
+    data_dict = {
+        'product_page_url': array_product_page_url,
+        'universal_ product_code': array_universal_product_code,
+        'title': array_title,
+        'price_including_tax': array_price_incl_tax,
+        'price_excluding_tax': array_price_excl_tax,
+        'number_available': array_numb_available,
+        # 'product_description': array_description,
+        'category': array_category,
+        'review_rating': array_rating,
+        'image_url': array_img_url
+    }
+
+    # Create DataFrame
+    data = pd.DataFrame(data_dict)
+    # Write to CSV file
+    data.to_csv("products.csv")
