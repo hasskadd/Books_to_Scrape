@@ -37,3 +37,5 @@ pip freeze > requirements.txt
 ```bash
 python scrap.py
 ```
+##
+The scrapping will take some time . You can make yourself a coffee !!  😇  😇 
