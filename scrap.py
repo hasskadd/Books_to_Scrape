@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import csv
 import pandas as pd
 import re
+import os
 
 
 url = "http://books.toscrape.com/index.html"
@@ -152,6 +153,19 @@ if req.ok:
 
     # read DataFrame
     data = pd.read_csv("products.csv")
+    if not os.path.isdir('./categories'):
+        os.makedirs("./categories")
+        for (Category), group in data.groupby(['category']):
+            group.to_csv(f'categories/{Category}.csv', index=False)
 
-    for (Category), group in data.groupby(['category']):
-        group.to_csv(f'categories/{Category}.csv', index=False)
+    # Download Images
+    # check if there is a folder call "images" in Directory if not creact it
+    if not os.path.isdir('./images'):
+        os.makedirs("./images")
+        for i in range(len(array_img_url)):
+            image_name_dir = 'images/' + str(i) + '.png'
+            request_url = array_img_url[i]
+            response = requests.get(request_url)
+            if response.ok:
+                with open(image_name_dir, 'wb') as img_file:
+                    img_file.write(requests.get(request_url).content)
