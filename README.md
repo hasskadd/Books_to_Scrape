@@ -30,7 +30,7 @@ source <nom_env>/bin/activate
 ## Installer les dépendances 
 
 ```python
-pip freeze > requirements.txt
+pip install -r requirements.txt
 ```
 
 ## Lancer l'application 
