@@ -88,12 +88,12 @@ if req.ok:
             title = (res.find("h1")).string
             array_title.append(title)
             # make an array of price include taxes
-            price_including_tax = (res.find(
-                "th", text="Price (incl. tax)").find_next_sibling("td").text).split('£')[1]
+            price_including_tax = float((res.find(
+                "th", text="Price (incl. tax)").find_next_sibling("td").text).split('£')[1])
             array_price_incl_tax.append(price_including_tax)
             # make an array of price excl taxes
-            price_excluding_tax = (res.find(
-                "th", text="Price (excl. tax)").find_next_sibling("td").text).split('£')[1]
+            price_excluding_tax = float((res.find(
+                "th", text="Price (excl. tax)").find_next_sibling("td").text).split('£')[1])
             array_price_excl_tax.append(price_excluding_tax)
             # make an array of number available
             stringSplit = (
@@ -112,29 +112,34 @@ if req.ok:
             array_img_url.append(image_url)
             # make an array of rating
             ratingStar = {
-                "One": "1/5",
-                "Two": "2/5",
-                "Three": "3/5",
-                "Four": "4/5",
-                "Five": "5/5"
+                "One": "1 sur 5",
+                "Two": "2 sur 5",
+                "Three": "3 sur 5",
+                "Four": "4 sur 5",
+                "Five": "5 sur 5"
             }
             find_rating = (((res.find(class_="instock availability")
                              ).find_next_sibling("p")).get("class"))[1]
             review_rating = ratingStar.get(find_rating)
             array_rating.append(review_rating)
             # make an array of description
-            # description = ((res.find(class_="sub-header")
-            #               ).find_next_sibling("p")).text
-            # array_description.append(description)
+            description = (
+                (res.find(class_="sub-header")).find_next_sibling("p"))
+            if description is not None:
+                get_description = description.text
+                array_description.append(get_description)
+            else:
+                description = None
+                array_description.append(description)
 
     data_dict = {
         'product_page_url': array_product_page_url,
         'universal_ product_code': array_universal_product_code,
         'title': array_title,
-        'price_including_tax': array_price_incl_tax,
-        'price_excluding_tax': array_price_excl_tax,
+        'price_including_tax (£)': array_price_incl_tax,
+        'price_excluding_tax (£)': array_price_excl_tax,
         'number_available': array_numb_available,
-        # 'product_description': array_description,
+        'product_description': array_description,
         'category': array_category,
         'review_rating': array_rating,
         'image_url': array_img_url
@@ -144,3 +149,9 @@ if req.ok:
     data = pd.DataFrame(data_dict)
     # Write to CSV file
     data.to_csv("products.csv")
+
+    # read DataFrame
+    data = pd.read_csv("products.csv")
+
+    for (Category), group in data.groupby(['category']):
+        group.to_csv(f'categories/{Category}.csv', index=False)
