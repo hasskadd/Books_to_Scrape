@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import csv
 import os
 import re
+import time
 
 
 url = "http://books.toscrape.com/index.html" 
@@ -126,7 +127,7 @@ if req.ok:
                 print("your " + file_Name + " csv file is created")
                 if not os.path.isdir('./images'+'/'+ file_Name):
                     os.makedirs("./images"+'/'+ file_Name)
-                print("download image")
+                print("download images")
                 for i in range(len(array_img_url)):
                     image_name_dir = 'images/'+ file_Name+'/'+ str(i) + '.png'
                     request_url = array_img_url[i]
@@ -134,5 +135,6 @@ if req.ok:
                     if response.ok:
                         with open(image_name_dir, 'wb') as img_file:
                             img_file.write(requests.get(request_url).content)
+    time.sleep(3)          
         
 print("Finish")          
