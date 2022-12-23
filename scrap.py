@@ -59,6 +59,7 @@ if req.ok:
                 array_category = []
                 array_img_url = []
                 array_rating = []
+                
                 print("please wait...")
                 for y in array_links_book_txt:
                     req = requests.get(y)
@@ -118,10 +119,12 @@ if req.ok:
                         else:
                             description = None
                             array_description.append(description)
+  
                 en_tete = ['product_page_url', 'universal_product_code', 'title', 'price_incl_tax', 'price_excl_tax', 'numb_available', 'description', 'category', 'img_url', 'rating']
+
                 writer = csv.writer(csv_file, delimiter=',')
                 writer.writerow(en_tete)
-                for product_page_url,universal_product_code, title,price_incl_tax, price_excl_tax, numb_available,description,category, img_url, rating in zip(array_product_page_url, array_universal_product_code, array_title, array_price_incl_tax, array_price_excl_tax, array_numb_available, array_description,array_category, array_img_url,array_rating):
+                for  product_page_url,universal_product_code, title,price_incl_tax, price_excl_tax, numb_available,description,category, img_url, rating in zip(array_product_page_url, array_universal_product_code, array_title, array_price_incl_tax, array_price_excl_tax, array_numb_available, array_description,array_category, array_img_url,array_rating):
 
                     writer.writerow([product_page_url,universal_product_code, title,price_incl_tax, price_excl_tax, numb_available,description,category, img_url, rating])
                 print("your " + file_Name + " csv file is created")
@@ -129,7 +132,7 @@ if req.ok:
                     os.makedirs("./images"+'/'+ file_Name)
                 print("download images")
                 for i in range(len(array_img_url)):
-                    image_name_dir = 'images/'+ file_Name+'/'+ str(i) + '.png'
+                    image_name_dir = 'images/'+ file_Name+'/'+ str(array_universal_product_code[i]) + '.png'
                     request_url = array_img_url[i]
                     response = requests.get(request_url)
                     if response.ok:
